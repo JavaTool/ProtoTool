@@ -1,0 +1,38 @@
+
+
+message REQUEST_ACCOUNT_REGISTER
+{
+	require string account = 1;
+	require string password = 2;
+}
+
+message REQUEST_ACCOUNT_LOGIN
+{
+	require string account = 1;
+	require string password = 2;
+}
+
+message VO_ACCOUNT_PLAYER_INFO
+{
+	require int32 instanceId = 1;
+	require string name = 2;
+	require int32 roleVersion = 3;
+	require int32 headVersion = 4;
+	repeated int32 animationGloabId = 5;
+	repeated int32 headGloabId = 6;
+	require int32 level = 7;
+	require int32 loginTimes = 8;
+	require int32 roleIndex = 9;
+	require string job = 10;
+}
+
+message REPONSE_ACCOUNT_ROLE_LIST
+{
+	repeated VO_ACCOUNT_PLAYER_INFO players = 1;
+}
+
+message REQUEST_ACCOUNT_LOGOUT
+{
+	require string account = 1;
+	require string password = 2;
+}

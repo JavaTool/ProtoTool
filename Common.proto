@@ -1,0 +1,13 @@
+
+message REPONSE_EXECUTE_OK
+{
+	require int32 messageId = 1;
+	require string message = 2;
+}
+
+message REPONSE_EXECUTE_ERROR
+{
+	require int32 messageId = 1;
+	require int32 errorCode = 2;
+	require string message = 3;
+}
