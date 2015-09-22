@@ -10,15 +10,20 @@ public class MessageIdScaner {
 	
 	private static final String HEAD = "MI_";
 	
-	private static final String REQUEST = HEAD + "REQUEST_";
+	private static final String REQUEST = "REQUEST_";
 	
-	private static final String RESPONSE = HEAD + "RESPONSE_";
+	private static final String RESPONSE = "RESPONSE_";
+	
+	private static final String HEAD_REQUEST = HEAD + REQUEST;
+	
+	private static final String HEAD_RESPONSE = HEAD + RESPONSE;
 	
 	public Map<String, ProtoMessage> scan(File file) throws Exception {
 		LineNumberReader reader = new LineNumberReader(new FileReader(file));
 		Map<String, ProtoMessage> messages = new HashMap<String, ProtoMessage>();
 		try {
 			String line;
+			String protoName = null;
 			while ((line = reader.readLine()) != null) {
 				int start = line.indexOf(HEAD);
 				int end = line.indexOf(';');
@@ -26,16 +31,22 @@ public class MessageIdScaner {
 					line = line.substring(start, end).trim();
 					String[] infos = line.split("=");
 					ProtoMessage protoMessage = new ProtoMessage();
-					if (infos[0].startsWith(REQUEST)) {
-						
-					} else if (infos[0].startsWith(RESPONSE)) {
-						
+					
+					if (infos[0].startsWith(HEAD_REQUEST)) {
+						protoMessage.setHead(REQUEST);
+					} else if (infos[0].startsWith(HEAD_RESPONSE)) {
+						protoMessage.setHead(RESPONSE);
 					} else {
 						throw new Exception("Unknow line : " + line);
 					}
+					
 					protoMessage.setMessageIdName(infos[0]);
 					protoMessage.setMessageIdValue(Integer.parseInt(infos[1]));
+					protoMessage.setProtoName(protoName);
+					
 					messages.put(infos[0], protoMessage);
+				} else if (line.contains("@proto")) {
+					protoName = line.contains("=") ? line.split("=")[1] : null;
 				}
 			}
 		} finally {
