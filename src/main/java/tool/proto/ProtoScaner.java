@@ -34,7 +34,7 @@ public class ProtoScaner {
 		}
 	}
 	
-	public void scanProto(File file) throws Exception {
+	private void scanProto(File file) throws Exception {
 		LineNumberReader reader = new LineNumberReader(new FileReader(file));
 		String protoName = file.getName().split("\\.")[0];
 		ProtoMessage message = map.get(protoName);
@@ -71,6 +71,14 @@ public class ProtoScaner {
 		} finally {
 			reader.close();
 		}
+	}
+	
+	public Map<String, ProtoMessage> getMessages() {
+		return map;
+	}
+	
+	public Multimap<String, String> getProtos() {
+		return protos;
 	}
 
 }
