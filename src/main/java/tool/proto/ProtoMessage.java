@@ -47,6 +47,10 @@ public class ProtoMessage {
 	public void setFields(Map<String, ProtoMessageField> fields) {
 		this.fields = fields;
 	}
+	
+	public Map<String, ProtoMessageField> getFields() {
+		return fields;
+	}
 
 	public String getHead() {
 		return head;
@@ -86,6 +90,14 @@ public class ProtoMessage {
 
 	public void setReturn(boolean isReturn) {
 		this.isReturn = isReturn;
+	}
+	
+	public boolean isServerProcessor() {
+		return messageIdName.contains(MessageIdScaner.REQUEST);
+	}
+	
+	public boolean isClientProcessor() {
+		return messageIdName.contains(MessageIdScaner.RESPONSE);
 	}
 
 }

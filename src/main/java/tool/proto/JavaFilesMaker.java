@@ -1,6 +1,8 @@
 package tool.proto;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class JavaFilesMaker {
 	
@@ -21,8 +23,64 @@ public class JavaFilesMaker {
 		}
 	}
 	
-	protected static boolean checkIndex(String[] args, int index) {
+	public static boolean checkIndex(String[] args, int index) {
 		return args != null && args.length > index && args[index].length() > 0;
+	}
+	
+	public static File createFile(File dir, String name) {
+		File batFile = new File(dir, name);
+		batFile.delete();
+		try {
+			batFile.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return batFile;
+	}
+	
+	public static File createFile(File file) {
+		file.delete();
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return file;
+	}
+	
+	public static void output(File batFile, String cmd) {
+		if (cmd != null && cmd.length() > 0) {
+			try {
+				FileWriter writer = new FileWriter(batFile);
+				writer.append(cmd);
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static String firstUpper(String str) {
+		return str.substring(0, 1).toUpperCase() + (str.length() > 1 ? str.substring(1) : "");
+	}
+	
+	public static String firstLower(String str) {
+		return str.substring(0, 1).toLowerCase() + (str.length() > 1 ? str.substring(1) : "");
+	}
+	
+	public static String getProtoClassName(String className) {
+		if (className.equals("int32") || className.equals("uint32")) {
+			return "Integer";
+		} else if (className.equals("int64")) {
+			return "Long";
+		} else if (className.equals("string")) {
+			return "String";
+		} else if (className.equals("bool")) {
+			return "Boolean";
+		} else {
+			return className;
+		}
 	}
 
 }

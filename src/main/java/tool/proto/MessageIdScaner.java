@@ -8,11 +8,11 @@ import java.util.Map;
 
 public class MessageIdScaner {
 	
-	private static final String HEAD = "MI_";
+	public static final String HEAD = "MI_";
 	
-	private static final String REQUEST = "REQUEST_";
+	public static final String REQUEST = "REQUEST_";
 	
-	private static final String RESPONSE = "RESPONSE_";
+	public static final String RESPONSE = "RESPONSE_";
 	
 	private static final String HEAD_REQUEST = HEAD + REQUEST;
 	
