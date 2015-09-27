@@ -3,13 +3,14 @@ package tool.proto;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
 public class JavaFilesMaker {
 	
 	private static final String PATH = "cg/base/io/proto";
 	
 	public static void main(String[] args) {
-		new JavaFilesMaker().output(args == null || args.length == 0 ? new String[]{"../../../CrossGateBase/src", "proto_src", ""} : args);
+		new JavaFilesMaker().output(args == null || args.length == 0 ? new String[]{"../../../CrossGateBase/src", "/Users/hyfu/Documents/workspace/CrossGateProject/program/proto/proto_src", ""} : args);
 //		new JavaFilesMaker().output(new String[]{"D:/file/workspace/ServerIO/src", "D:/file/workspace/Prj/proto/proto_src", "", "../TankServer/src"});
 	}
 	
@@ -18,6 +19,7 @@ public class JavaFilesMaker {
 		ProtoScaner protoScaner = new ProtoScaner();
 		try {
 			protoScaner.scan(dir);
+			new RequestMaker(protoScaner.getMessages()).output(args[0], PATH);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -25,6 +27,10 @@ public class JavaFilesMaker {
 	
 	public static boolean checkIndex(String[] args, int index) {
 		return args != null && args.length > index && args[index].length() > 0;
+	}
+	
+	public static boolean checkString(String arg) {
+		return arg != null && arg.length() > 0;
 	}
 	
 	public static File createFile(File dir, String name) {
@@ -80,6 +86,13 @@ public class JavaFilesMaker {
 			return "Boolean";
 		} else {
 			return className;
+		}
+	}
+	
+	public static void addImport(Map<String, String> imports, StringBuilder importBuilder, @SuppressWarnings("rawtypes") Class clz) {
+		if (!imports.containsKey(clz.getSimpleName())) {
+			imports.put(clz.getSimpleName(), clz.getSimpleName());
+			importBuilder.append("import ").append(clz.getName()).append(";").append("\r\n");
 		}
 	}
 

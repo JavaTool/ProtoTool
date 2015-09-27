@@ -99,5 +99,9 @@ public class ProtoMessage {
 	public boolean isClientProcessor() {
 		return messageIdName.contains(MessageIdScaner.RESPONSE);
 	}
+	
+	public String getName() {
+		return getMessageIdName().replaceFirst("MI", "").replaceFirst(getHead(), "");
+	}
 
 }

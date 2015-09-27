@@ -6,17 +6,22 @@ import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.Map;
 
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
 public class ProtoScaner {
 	
 	private Map<String, ProtoMessage> map;
 	
-	private Multimap<String, String> protos;
+	private Multimap<String, String> protos = LinkedListMultimap.create();
 	
 	public void scan(File file) throws Exception {
 		map = new MessageIdScaner().scan(new File(file, "MessageId.proto"));
 		
+		scan0(file);
+	}
+	
+	public void scan0(File file) throws Exception {
 		if (file.isFile()) {
 			scanProto(file);
 		} else {
@@ -29,7 +34,7 @@ public class ProtoScaner {
 				}
 				
 			})) {
-				scan(subFile);
+				scan0(subFile);
 			}
 		}
 	}
@@ -50,6 +55,10 @@ public class ProtoScaner {
 				} else if (line.startsWith("message") || line.startsWith("enum")) {
 					String messageName = line.split(" ")[1].replace("{", "");
 					message = map.get(messageName);
+					if (message == null) {
+						message = new ProtoMessage();
+						map.put(messageName, message);
+					}
 					message.setEnum(line.startsWith("enum"));
 					message.setReturn(isReturn);
 					isReturn = false;

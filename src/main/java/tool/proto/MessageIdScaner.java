@@ -40,11 +40,11 @@ public class MessageIdScaner {
 						throw new Exception("Unknow line : " + line);
 					}
 					
-					protoMessage.setMessageIdName(infos[0]);
-					protoMessage.setMessageIdValue(Integer.parseInt(infos[1]));
+					protoMessage.setMessageIdName(infos[0].trim());
+					protoMessage.setMessageIdValue(Integer.parseInt(infos[1].trim()));
 					protoMessage.setProtoName(protoName);
 					
-					messages.put(infos[0], protoMessage);
+					messages.put(protoMessage.getMessageIdName().replaceFirst(HEAD, ""), protoMessage);
 				} else if (line.contains("@proto")) {
 					protoName = line.contains("=") ? line.split("=")[1] : null;
 				}
