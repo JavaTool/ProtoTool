@@ -7,10 +7,10 @@ import java.util.Map;
 
 public class JavaFilesMaker {
 	
-	private static final String PATH = "cg/base/io/proto";
+	private static final String PATH = "cg/base/io/";
 	
 	public static void main(String[] args) {
-		new JavaFilesMaker().output(args == null || args.length == 0 ? new String[]{"../../../CrossGateBase/src", "/Users/hyfu/Documents/workspace/CrossGateProject/program/proto/proto_src", ""} : args);
+		new JavaFilesMaker().output(args == null || args.length == 0 ? new String[]{"/Users/hyfu/Documents/workspace/CrossGateBase/src", "/Users/hyfu/Documents/workspace/CrossGateProject/program/proto/proto_src", ""} : args);
 //		new JavaFilesMaker().output(new String[]{"D:/file/workspace/ServerIO/src", "D:/file/workspace/Prj/proto/proto_src", "", "../TankServer/src"});
 	}
 	
@@ -19,7 +19,9 @@ public class JavaFilesMaker {
 		ProtoScaner protoScaner = new ProtoScaner();
 		try {
 			protoScaner.scan(dir);
-			new RequestMaker(protoScaner.getMessages()).output(args[0], PATH);
+			Map<String, ProtoMessage> messages = protoScaner.getMessages();
+//			new RequestMaker(messages).output(args[0], PATH + "proto");
+			new RequestMaker(messages).output(args[0], PATH + "request", PATH + "proto");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

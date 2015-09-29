@@ -93,15 +93,15 @@ public class ProtoMessage {
 	}
 	
 	public boolean isServerProcessor() {
-		return messageIdName.contains(MessageIdScaner.REQUEST);
+		return messageIdName != null && messageIdName.contains(MessageIdScaner.REQUEST);
 	}
 	
 	public boolean isClientProcessor() {
-		return messageIdName.contains(MessageIdScaner.RESPONSE);
+		return messageIdName != null && messageIdName.contains(MessageIdScaner.RESPONSE);
 	}
 	
 	public String getName() {
-		return getMessageIdName().replaceFirst("MI", "").replaceFirst(getHead(), "");
+		return getMessageIdName().replaceFirst(MessageIdScaner.HEAD, "");
 	}
 
 }

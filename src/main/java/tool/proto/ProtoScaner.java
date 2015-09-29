@@ -42,7 +42,7 @@ public class ProtoScaner {
 	private void scanProto(File file) throws Exception {
 		LineNumberReader reader = new LineNumberReader(new FileReader(file));
 		String protoName = file.getName().split("\\.")[0];
-		ProtoMessage message = map.get(protoName);
+		ProtoMessage message = null;
 		try {
 			String line;
 			boolean isReturn = false;
@@ -51,7 +51,7 @@ public class ProtoScaner {
 				if (line.contains("@return")) {
 					isReturn = line.contains("@return");
 				} else if (line.startsWith("import ")) {
-					message.putImport(line.split(";")[0].replace("import ", "").replace("\"", "").replace(".proto", ""));
+//					message.putImport(line.split(";")[0].replace("import ", "").replace("\"", "").replace(".proto", ""));
 				} else if (line.startsWith("message") || line.startsWith("enum")) {
 					String messageName = line.split(" ")[1].replace("{", "");
 					message = map.get(messageName);
@@ -59,6 +59,7 @@ public class ProtoScaner {
 						message = new ProtoMessage();
 						map.put(messageName, message);
 					}
+					message.setProtoName(protoName);
 					message.setEnum(line.startsWith("enum"));
 					message.setReturn(isReturn);
 					isReturn = false;
