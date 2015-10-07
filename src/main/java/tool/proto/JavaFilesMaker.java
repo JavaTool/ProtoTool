@@ -22,7 +22,7 @@ public class JavaFilesMaker {
 			Map<String, ProtoMessage> messages = protoScaner.getMessages();
 //			new RequestMaker(messages).output(args[0], PATH + "proto");
 			new RequestMaker(messages).output(args[0], PATH + "request", PATH + "proto");
-			new ResponseMaker(messages).output(args[0], PATH + "request", PATH + "proto");
+			new ResponseMaker(messages).output(args[0], PATH + "response", PATH + "proto");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
