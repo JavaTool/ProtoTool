@@ -33,20 +33,18 @@ public class ResponseMaker {
 			java = new File(java, path);
 			java.mkdirs();
 			java = JavaFilesMaker.createFile(java, javaName + ".java");
-			String importPre = "import " + protoPath.replaceAll("/", ".");
+			String importPre = "import " + protoPath.replaceAll("/", ".") + ".";
 			
 			StringBuilder builder = new StringBuilder("package ").append(path.replaceAll("/", ".")).append(";"), elementBuilder = new StringBuilder("\r\n");
+			builder.append("\r\n");
 			builder.append("\r\n");
 			elementBuilder.append("\t").append("private ").append(JavaFilesMaker.firstUpper(message.getName())).append(".Builder builder = ").append(JavaFilesMaker.firstUpper(message.getName())).append(".newBuilder();");
 			elementBuilder.append("\r\n");
 			StringBuilder importBuilder = new StringBuilder(), methodBuilder = new StringBuilder(), paramBulider = new StringBuilder(), annotateBuilder = new StringBuilder();
 			StringBuilder methodsBuilder = new StringBuilder();
-			importBuilder.append("\r\n");
-			importBuilder.append("import net.io.protocal.proto..ProtoResponse;");
-			importBuilder.append("\r\n");
-			importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;");
-			importBuilder.append("\r\n");
-			importBuilder.append("import com.google.protobuf.InvalidProtocolBufferException;");
+			importBuilder.append("import net.io.protocal.proto.ProtoResponse;").append("\r\n");
+			importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;").append("\r\n");
+			importBuilder.append("import com.google.protobuf.InvalidProtocolBufferException;").append("\r\n");
 			Map<String, String> imports = new HashMap<String, String>();
 			imports.put(message.getProtoName(), message.getProtoName());
 			for (ProtoMessageField field : message.getFields().values()) {
@@ -73,7 +71,7 @@ public class ResponseMaker {
 					methodBuilder.append(className).append(" ");
 					paramBulider.append("\t\t").append("builder.set").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name).append(");").append("\r\n");
 				} else if (field.type.equals("repeated")) {
-					JavaFilesMaker.addImport(imports, importBuilder, Iterable.class);
+//					JavaFilesMaker.addImport(imports, importBuilder, Iterable.class);
 					methodBuilder.append("Iterable<").append(className).append("> ");
 					paramBulider.append("\t\t").append("builder.addAll").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name).append(");").append("\r\n");
 				}
@@ -85,15 +83,15 @@ public class ResponseMaker {
 				methodBuilder.append("\r\n");
 				methodsBuilder.append(annotateBuilder.toString()).append(methodBuilder.toString());
 			}
-			methodsBuilder.append("\r\n");
-			methodsBuilder.append("\t").append("@Override").append("\r\n");
-			methodsBuilder.append("\t").append("protected byte[] buildDatas() {").append("\r\n");
-			methodsBuilder.append("\t\t").append("setSendMessageId0(").append(message.getName().equals("VO_Error") ? "\"MIVO_Error\"" : "getReceiveMessageId() + \"Resp\"").append(");");
-			methodsBuilder.append("\r\n");
-			methodsBuilder.append("\t\t").append("setStatus(").append(message.getName().equals("VO_Error") ? "HTTP_STATUS_LOGIC_ERROR" : "HTTP_STATUS_SUCCESS").append(");");
-			methodsBuilder.append("\r\n");
-			methodsBuilder.append("\t\t").append("return builder.build().toByteArray();").append("\r\n");
-			methodsBuilder.append("\t").append("}").append("\r\n");
+//			methodsBuilder.append("\r\n");
+//			methodsBuilder.append("\t").append("@Override").append("\r\n");
+//			methodsBuilder.append("\t").append("protected byte[] buildDatas() {").append("\r\n");
+//			methodsBuilder.append("\t\t").append("setSendMessageId0(").append(message.getName().equals("VO_Error") ? "\"MIVO_Error\"" : "getReceiveMessageId() + \"Resp\"").append(");");
+//			methodsBuilder.append("\r\n");
+//			methodsBuilder.append("\t\t").append("setStatus(").append(message.getName().equals("VO_Error") ? "HTTP_STATUS_LOGIC_ERROR" : "HTTP_STATUS_SUCCESS").append(");");
+//			methodsBuilder.append("\r\n");
+//			methodsBuilder.append("\t\t").append("return builder.build().toByteArray();").append("\r\n");
+//			methodsBuilder.append("\t").append("}").append("\r\n");
 	
 			methodsBuilder.append("\r\n");
 			methodsBuilder.append("\t").append("@Override").append("\r\n");
@@ -101,15 +99,25 @@ public class ResponseMaker {
 			methodsBuilder.append("\t\t").append("builder.mergeFrom(data);").append("\r\n");
 			methodsBuilder.append("\t").append("}").append("\r\n");
 			
+//			methodsBuilder.append("\r\n");
+//			methodsBuilder.append("\t").append("@Deprecated").append("\r\n");
+//			methodsBuilder.append("\t").append("@Override").append("\r\n");
+//			methodsBuilder.append("\t").append("public void setSendMessageId(String sendMessageId) {").append("\r\n");
+//			methodsBuilder.append("\t\t").append("throw new UnsupportedOperationException();").append("\r\n");
+//			methodsBuilder.append("\t").append("}").append("\r\n");
+	
 			methodsBuilder.append("\r\n");
-			methodsBuilder.append("\t").append("@Deprecated").append("\r\n");
 			methodsBuilder.append("\t").append("@Override").append("\r\n");
-			methodsBuilder.append("\t").append("public void setSendMessageId(String sendMessageId) {").append("\r\n");
-			methodsBuilder.append("\t\t").append("throw new UnsupportedOperationException();").append("\r\n");
+			methodsBuilder.append("\t").append("public void setError(int errorCode, String errorMsg) {").append("\r\n");
+			methodsBuilder.append("\t").append("}").append("\r\n");
+	
+			methodsBuilder.append("\r\n");
+			methodsBuilder.append("\t").append("@Override").append("\r\n");
+			methodsBuilder.append("\t").append("public boolean hasError() {").append("\r\n");
+			methodsBuilder.append("\t\t").append("return false;").append("\r\n");
 			methodsBuilder.append("\t").append("}").append("\r\n");
 			
 			builder.append(importBuilder.toString());
-			builder.append("\r\n");
 			builder.append("\r\n");
 			builder.append("/**").append("\r\n");
 			builder.append(" * This is a auto make java file, so do not modify me.").append("\r\n");
@@ -118,13 +126,10 @@ public class ResponseMaker {
 			builder.append("public class ").append(javaName).append(" extends ProtoResponse {");
 			builder.append("\r\n");
 			builder.append(elementBuilder.toString());
-			builder.append("\r\n");
-			builder.append("\t").append("public ").append(javaName).append("(Request request) {");
-			builder.append("\r\n");
-			builder.append("\t\t").append("super(request);");
-			builder.append("\r\n");
-			builder.append("\t").append("}");
-			builder.append("\r\n");
+//			builder.append("\r\n");
+//			builder.append("\t").append("public ").append(javaName).append("(Request request) {").append("\r\n");
+//			builder.append("\t\t").append("super(request);").append("\r\n");
+//			builder.append("\t").append("}").append("\r\n");
 			builder.append("\r\n");
 			builder.append("\t").append("public ").append(JavaFilesMaker.firstUpper(message.getName())).append(" get").append(JavaFilesMaker.firstUpper(message.getName())).append("() {");
 			builder.append("\r\n");
