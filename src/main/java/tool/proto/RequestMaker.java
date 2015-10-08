@@ -40,7 +40,7 @@ public class RequestMaker {
 			java = new File(java, path);
 			java.mkdirs();
 			java = JavaFilesMaker.createFile(java, javaName + ".java");
-			String importPre = "import " + protoPath.replaceAll("/", ".");
+			String importPre = "import " + protoPath.replaceAll("/", ".") + ".";
 			
 			StringBuilder builder = new StringBuilder("package "), elementBuilder = new StringBuilder("\r\n");
 			builder.append(path.replaceAll("/", ".")).append(";").append("\r\n");
@@ -54,11 +54,19 @@ public class RequestMaker {
 			importBuilder.append("\r\n");
 			importBuilder.append("import net.dipatch.ISender;").append("\r\n");
 			importBuilder.append("import net.io.protocal.proto.ProtoRequest;").append("\r\n");
-			importBuilder.append(importPre).append(".").append(message.getProtoName()).append("Protos.*;");
+			importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;");
 			Map<String, String> imports = Maps.newHashMap();
 			
 			for (ProtoMessageField field : message.getFields().values()) {
 				String className = JavaFilesMaker.getProtoClassName(field.className);
+				if (messages.containsKey(className)) {
+					String importFile = messages.get(className).getProtoName();
+					if (!imports.containsKey(importFile)) {
+						imports.put(importFile, importFile);
+						importBuilder.append("\r\n");
+						importBuilder.append(importPre).append(importFile).append("Protos.*;");
+					}
+				}
 				
 				annotateBuilder.setLength(0);
 				annotateBuilder.append("\t").append("/**").append("\r\n");
