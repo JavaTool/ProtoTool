@@ -28,7 +28,13 @@ public class ResponseMaker {
 	
 	private void outputResponses(ProtoMessage message, String dir, String path, String protoPath) throws Exception {
 		if (message.getFields().size() > 0) {
-			String javaName = JavaFilesMaker.firstUpper(message.getName()) + "Response";
+			String[] names = message.getName().split("_");
+			StringBuilder nameBuilder = new StringBuilder();
+			for (String nam : names) {
+				nameBuilder.append(JavaFilesMaker.firstUpper(nam.toLowerCase()));
+			}
+			String name = nameBuilder.toString();
+			String javaName = name;
 			File java = new File(JavaFilesMaker.checkString(dir) ? dir : "../../../CrossGateBase/src");
 			java = new File(java, path);
 			java.mkdirs();

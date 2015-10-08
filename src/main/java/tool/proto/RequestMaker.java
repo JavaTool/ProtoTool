@@ -35,7 +35,7 @@ public class RequestMaker {
 				nameBuilder.append(JavaFilesMaker.firstUpper(nam.toLowerCase()));
 			}
 			String name = nameBuilder.toString();
-			String javaName = name + "Request";
+			String javaName = name;
 			File java = new File(JavaFilesMaker.checkString(dir) ? dir : "../../../CrossGateBase/src");
 			java = new File(java, path);
 			java.mkdirs();
