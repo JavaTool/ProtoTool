@@ -88,9 +88,11 @@ public class MessageMaker {
 		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
 		builder.append(elementBuilder.toString());
 		builder.append("\r\n");
-		builder.append("\t").append("public ").append(javaName).append("(int messageId, int status, String sessionId, ISender sender, ").append(paramDefine).append(") {").append("\r\n");
-		builder.append("\t\t").append("super(messageId, status, sessionId, sender, null);").append("\r\n");
-		builder.append("\t\t").append("this.").append(param).append(" = ").append(param).append(";").append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("(int messageId, int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
+		builder.append("\t\t").append("super(messageId, status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t\t").append("if (datas != null) {").append("\r\n");
+		builder.append("\t\t\t").append(param).append(".mergeFrom(datas);").append("\r\n");
+		builder.append("\t\t").append("}").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append(methodsBuilder.toString()).append("\r\n");
