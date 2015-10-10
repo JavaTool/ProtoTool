@@ -58,16 +58,7 @@ public class MessageMaker {
 		imports.put(message.getProtoName(), message.getProtoName());
 		
 		for (ProtoMessageField field : message.getFields().values()) {
-			String className = JavaFilesMaker.getProtoClassName(field.className);
-			if (messages.containsKey(className)) {
-				String importFile = messages.get(className).getProtoName();
-				if (!imports.containsKey(importFile)) {
-					imports.put(importFile, importFile);
-					importBuilder.append(importPre).append(importFile).append("Protos.*;").append("\r\n");
-				}
-			}
-			
-			buildSet(methodsBuilder, importBuilder, field, imports, param2);
+			buildSet(methodsBuilder, importBuilder, field, imports, param2, importPre);
 			buildGet(methodsBuilder, importBuilder, field, imports, param1);
 		}
 		
@@ -126,16 +117,7 @@ public class MessageMaker {
 		imports.put(message.getProtoName(), message.getProtoName());
 		
 		for (ProtoMessageField field : message.getFields().values()) {
-			String className = JavaFilesMaker.getProtoClassName(field.className);
-			if (messages.containsKey(className)) {
-				String importFile = messages.get(className).getProtoName();
-				if (!imports.containsKey(importFile)) {
-					imports.put(importFile, importFile);
-					importBuilder.append(importPre).append(importFile).append("Protos.*;").append("\r\n");
-				}
-			}
-			
-			buildSet(methodsBuilder, importBuilder, field, imports, param);
+			buildSet(methodsBuilder, importBuilder, field, imports, param, importPre);
 			buildGet(methodsBuilder, importBuilder, field, imports, param);
 		}
 		
@@ -180,6 +162,8 @@ public class MessageMaker {
 	
 	private void buildGet(StringBuilder methodsBuilder, StringBuilder importBuilder, ProtoMessageField field, Map<String, String> imports, String param) {
 		String className = JavaFilesMaker.getProtoClassName(field.className);
+		String voClassName = JavaFilesMaker.makeJavaClassName(className);
+		boolean isJavaStruct = JavaFilesMaker.isJavaStruct(className);
 		StringBuilder annotateBuilder = new StringBuilder(), methodBuilder = new StringBuilder();
 		// annotate
 		annotateBuilder.append("\t").append("/**").append("\r\n");
@@ -189,12 +173,29 @@ public class MessageMaker {
 		// method
 		String getter = "get" + JavaFilesMaker.firstUpper(field.name);
 		if (field.type.equals("required") || field.type.equals("optional")) {
-			methodBuilder.append("\t").append("public ").append(checkClass(className)).append(" ").append(getter).append("() {").append("\r\n");
-			methodBuilder.append("\t\t").append("return ").append(param).append(".").append(getter).append("();").append("\r\n");
+			methodBuilder.append("\t").append("public ").append(checkClass(voClassName)).append(" ").append(getter).append("() {").append("\r\n");
+			methodBuilder.append("\t\t").append("return ");
+			if (isJavaStruct) {
+				methodBuilder.append(param).append(".").append(getter).append("();");
+			} else {
+				methodBuilder.append("new ").append(voClassName).append("(").append(param).append(".").append(getter).append("());");
+			}
+			methodBuilder.append("\r\n");
 		} else if (field.type.equals("repeated")) {
 			JavaFilesMaker.addImport(imports, importBuilder, List.class);
-			methodBuilder.append("\t").append("public List<").append(className).append("> ").append(getter).append("List() {").append("\r\n");
-			methodBuilder.append("\t\t").append("return ").append(param).append(".").append(getter).append("List();").append("\r\n");
+			if (isJavaStruct) {
+				methodBuilder.append("\t").append("public List<").append(className).append("> ").append(getter).append("List() {").append("\r\n");
+				methodBuilder.append("\t\t").append("return ").append(param).append(".").append(getter).append("List();").append("\r\n");
+			} else {
+				JavaFilesMaker.addImport(imports, importBuilder, Lists.class);
+				methodBuilder.append("\t").append("public List<").append(voClassName).append("> ").append(getter).append("List() {").append("\r\n");
+				methodBuilder.append("\t\t").append("List<").append(className).append("> list = ").append(param).append(".").append(getter).append("List();").append("\r\n");
+				methodBuilder.append("\t\t").append("List<").append(voClassName).append("> ret = Lists.newArrayListWithCapacity(list.size());").append("\r\n");
+				methodBuilder.append("\t\t").append("for (").append(className).append(" vo : list) {").append("\r\n");
+				methodBuilder.append("\t\t\t").append("ret.add(new ").append(voClassName).append("(vo));").append("\r\n");
+				methodBuilder.append("\t\t").append("}").append("\r\n");
+				methodBuilder.append("\t\t").append("return ret;").append("\r\n");
+			}
 		}
 		methodBuilder.append("\t").append("}").append("\r\n");
 		methodBuilder.append("\r\n");
@@ -202,7 +203,7 @@ public class MessageMaker {
 		methodsBuilder.append(annotateBuilder.toString()).append(methodBuilder.toString());
 	}
 	
-	private void buildSet(StringBuilder methodsBuilder, StringBuilder importBuilder, ProtoMessageField field, Map<String, String> imports, String param) {
+	private void buildSet(StringBuilder methodsBuilder, StringBuilder importBuilder, ProtoMessageField field, Map<String, String> imports, String param, String importPre) {
 		String className = JavaFilesMaker.getProtoClassName(field.className);
 		StringBuilder annotateBuilder = new StringBuilder(), methodBuilder = new StringBuilder(), paramBulider = new StringBuilder();
 		methodBuilder.append("\t").append("public void set").append(JavaFilesMaker.firstUpper(field.name)).append("(");
@@ -229,6 +230,14 @@ public class MessageMaker {
 			if (isJavaStruct) {
 				paramBulider.append("\t\t").append("builder.addAll").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name).append(");").append("\r\n");
 			} else {
+				if (messages.containsKey(className)) {
+					String importFile = messages.get(className).getProtoName();
+					if (!imports.containsKey(importFile)) {
+						imports.put(importFile, importFile);
+						importBuilder.append(importPre).append(importFile).append("Protos.*;").append("\r\n");
+					}
+				}
+				
 				JavaFilesMaker.addImport(imports, importBuilder, Lists.class);
 				paramBulider.append("\t\t").append("List<").append(className).append("> list = Lists.newLinkedList();").append("\r\n");
 				paramBulider.append("\t\t").append("for (").append(voClassName).append(" vo : ").append(field.name).append(") {").append("\r\n");
