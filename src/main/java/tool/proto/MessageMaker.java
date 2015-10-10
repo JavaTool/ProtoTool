@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class MessageMaker {
@@ -18,8 +19,12 @@ public class MessageMaker {
 	public void output(String dir, String path, String protoPath) {
 		try {
 			for (ProtoMessage message : messages.values()) {
-				if ((message.isServerProcessor() || message.isClientProcessor()) && message.getFields().size() > 0) {
-					outputRequests(message, dir, path, protoPath);
+				if (message.isServerProcessor() || message.isClientProcessor()) {
+					if (message.getFields().size() > 0) {
+						outputMessage(message, dir, path, protoPath);
+					}
+				} else {
+					outputVO(message, dir, path, protoPath);
 				}
 			}
 		} catch (Exception e) {
@@ -27,13 +32,78 @@ public class MessageMaker {
 		}
 	}
 	
-	private void outputRequests(ProtoMessage message, String dir, String path, String protoPath) throws Exception {
-		String[] names = message.getName().split("_");
-		StringBuilder nameBuilder = new StringBuilder();
-		for (String nam : names) {
-			nameBuilder.append(JavaFilesMaker.firstUpper(nam.toLowerCase()));
+	private void outputVO(ProtoMessage message, String dir, String path, String protoPath) throws Exception {
+		String name = JavaFilesMaker.makeJavaClassName(message.getName());
+		String javaName = name;
+		File java = new File(JavaFilesMaker.checkString(dir) ? dir : "../../../CrossGateBase/src");
+		java = new File(java, path);
+		java.mkdirs();
+		java = JavaFilesMaker.createFile(java, javaName + ".java");
+		String importPre = "import " + protoPath.replaceAll("/", ".") + ".";
+		
+		StringBuilder builder = new StringBuilder("package "), elementBuilder = new StringBuilder("\r\n");
+		builder.append(path.replaceAll("/", ".")).append(";").append("\r\n");
+		builder.append("\r\n");
+		String param1 = "vo";
+		String paramDefine1 = message.getName() + " " + param1;
+		elementBuilder.append("\t").append("private ").append(paramDefine1).append(";").append("\r\n");
+		elementBuilder.append("\r\n");
+		String param2 = "builder";
+		String paramDefine2 = message.getName() + ".Builder " + param2;
+		elementBuilder.append("\t").append("private ").append(paramDefine2).append(";").append("\r\n");
+		
+		StringBuilder importBuilder = new StringBuilder(), methodsBuilder = new StringBuilder();
+		importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;").append("\r\n");
+		Map<String, String> imports = Maps.newHashMap();
+		imports.put(message.getProtoName(), message.getProtoName());
+		
+		for (ProtoMessageField field : message.getFields().values()) {
+			String className = JavaFilesMaker.getProtoClassName(field.className);
+			if (messages.containsKey(className)) {
+				String importFile = messages.get(className).getProtoName();
+				if (!imports.containsKey(importFile)) {
+					imports.put(importFile, importFile);
+					importBuilder.append(importPre).append(importFile).append("Protos.*;").append("\r\n");
+				}
+			}
+			
+			buildSet(methodsBuilder, importBuilder, field, imports, param2);
+			buildGet(methodsBuilder, importBuilder, field, imports, param1);
 		}
-		String name = nameBuilder.toString();
+		
+		methodsBuilder.append("\t").append("public ").append(message.getName()).append(" get").append(message.getName()).append("() {").append("\r\n");
+		methodsBuilder.append("\t\t").append("return ").append(param1).append(" == null ? ").append(param2).append(".build()").append(" : ").append(param1).append(";").append("\r\n");
+		methodsBuilder.append("\t").append("}").append("\r\n");
+		methodsBuilder.append("\r\n");
+		
+		builder.append(importBuilder.toString());
+		builder.append("\r\n");
+		builder.append("/**").append("\r\n");
+		builder.append(" * This is a auto make java file, so do not modify me.").append("\r\n");
+		builder.append(" * @author fuhuiyuan").append("\r\n");
+		builder.append(" */").append("\r\n");
+		builder.append("public class ").append(javaName).append(" {").append("\r\n");
+		builder.append(elementBuilder.toString());
+		builder.append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("(").append(paramDefine1).append(") {").append("\r\n");
+		builder.append("\t\t").append("this.").append(param1).append(" = ").append(param1).append(";").append("\r\n");
+		builder.append("\t").append("}").append("\r\n");
+		builder.append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("() {").append("\r\n");
+		builder.append("\t\t").append(param2).append(" = ").append(message.getName()).append(".newBuilder();").append("\r\n");
+		builder.append("\t").append("}").append("\r\n");
+		builder.append("\r\n");
+		builder.append(methodsBuilder.toString());
+		builder.append("}").append("\r\n");
+		
+		FileWriter writer = new FileWriter(java);
+		writer.append(builder.toString());
+		writer.flush();
+		writer.close();
+	}
+	
+	private void outputMessage(ProtoMessage message, String dir, String path, String protoPath) throws Exception {
+		String name = JavaFilesMaker.makeJavaClassName(message.getName());
 		String javaName = name;
 		File java = new File(JavaFilesMaker.checkString(dir) ? dir : "../../../CrossGateBase/src");
 		java = new File(java, path);
@@ -143,17 +213,31 @@ public class MessageMaker {
 		annotateBuilder.append("\t").append(" * ").append("\t\t\t").append(field.getAnnotate()).append("\r\n");
 		annotateBuilder.append("\t").append(" */").append("\r\n");
 		// method
+		String voClassName = JavaFilesMaker.makeJavaClassName(className);
+		boolean isJavaStruct = JavaFilesMaker.isJavaStruct(className);
 		if (field.type.equals("required") || field.type.equals("optional")) {
-			methodBuilder.append(className).append(" ");
-			paramBulider.append("\t\t").append("builder.set").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name).append(");").append("\r\n");
+			methodBuilder.append(voClassName).append(" ");
+			paramBulider.append("\t\t").append("builder.set").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name);
+			if (isJavaStruct) {
+				paramBulider.append(");");
+			} else {
+				paramBulider.append(".get").append(className).append("());");
+			}
+			paramBulider.append("\r\n");
 		} else if (field.type.equals("repeated")) {
-//			JavaFilesMaker.addImport(imports, importBuilder, Iterable.class);
-			methodBuilder.append("Iterable<").append(className).append("> ");
-			paramBulider.append("\t\t").append("builder.addAll").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name).append(");").append("\r\n");
+			methodBuilder.append("Iterable<").append(voClassName).append("> ");
+			if (isJavaStruct) {
+				paramBulider.append("\t\t").append("builder.addAll").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name).append(");").append("\r\n");
+			} else {
+				JavaFilesMaker.addImport(imports, importBuilder, Lists.class);
+				paramBulider.append("\t\t").append("List<").append(className).append("> list = Lists.newLinkedList();").append("\r\n");
+				paramBulider.append("\t\t").append("for (").append(voClassName).append(" vo : ").append(field.name).append(") {").append("\r\n");
+				paramBulider.append("\t\t\t").append("list.add(vo.get").append(className).append("());").append("\r\n");
+				paramBulider.append("\t\t").append("}").append("\r\n");
+				paramBulider.append("\t\t").append("builder.addAll").append(JavaFilesMaker.firstUpper(field.name)).append("(list);").append("\r\n");
+			}
 		}
-		methodBuilder.append(field.name).append(", ");
-		methodBuilder.setLength(methodBuilder.length() - 2);
-		methodBuilder.append(") {").append("\r\n");
+		methodBuilder.append(field.name).append(") {").append("\r\n");
 		methodBuilder.append(paramBulider.toString());
 		methodBuilder.append("\t").append("}").append("\r\n");
 		methodBuilder.append("\r\n");

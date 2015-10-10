@@ -62,6 +62,7 @@ public class ProtoScaner {
 					message.setProtoName(protoName);
 					message.setEnum(line.startsWith("enum"));
 					message.setReturn(isReturn);
+					message.setMessageIdName(messageName);
 					isReturn = false;
 					protos.put(protoName, messageName);
 				} else if (message != null && line.trim().length() > 0 && !line.trim().startsWith("//")) {
