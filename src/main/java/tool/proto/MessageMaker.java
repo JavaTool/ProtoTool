@@ -95,6 +95,10 @@ public class MessageMaker {
 		builder.append("\t\t").append("}").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("() {").append("\r\n");
+		builder.append("\t\t").append("super();").append("\r\n");
+		builder.append("\t").append("}").append("\r\n");
+		builder.append("\r\n");
 		builder.append(methodsBuilder.toString()).append("\r\n");
 		builder.append("}").append("\r\n");
 		
