@@ -177,7 +177,7 @@ public class MessageMaker {
 			methodBuilder.append("\t").append("public ").append(checkName).append(" ").append(getter).append("() {").append("\r\n");
 			methodBuilder.append("\t\t").append(checkName).append(" ret = ");
 			if (isJavaStruct) {
-				methodBuilder.append(param).append(".").append(getter).append("();");
+				methodBuilder.append(param).append(".").append(getter).append("();").append("\r\n");
 			} else {
 				if (field.type.equals("optional")) {
 					methodBuilder.append("null;").append("\r\n");
