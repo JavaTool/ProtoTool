@@ -110,6 +110,7 @@ public class MessageMaker {
 		StringBuilder importBuilder = new StringBuilder();
 		importBuilder.append("import net.dipatch.ISender;").append("\r\n");
 		importBuilder.append("import net.io.protocal.proto.ProtoMessage;").append("\r\n");
+		importBuilder.append("import cg.base.io.proto.MessageIdProto.MessageId;").append("\r\n");
 		
 		builder.append(importBuilder.toString());
 		builder.append("\r\n");
@@ -119,12 +120,13 @@ public class MessageMaker {
 		builder.append(" */").append("\r\n");
 		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
 		builder.append("\r\n");
-		builder.append("\t").append("public ").append(javaName).append("(int messageId, int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
-		builder.append("\t\t").append("super(messageId, status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("(int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
+		builder.append("\t\t").append("super(MessageId.").append(message.getMessageIdName()).append("_VALUE, status, sessionId, sender, datas);").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append("\t").append("public ").append(javaName).append("() {").append("\r\n");
 		builder.append("\t\t").append("super();").append("\r\n");
+		builder.append("\t\t").append("messageId = MessageId.").append(message.getMessageIdName()).append("_VALUE;").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append("}").append("\r\n");
@@ -155,6 +157,7 @@ public class MessageMaker {
 		importBuilder.append("import net.dipatch.ISender;").append("\r\n");
 		importBuilder.append("import net.io.protocal.proto.ProtoMessage;").append("\r\n");
 		importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;").append("\r\n");
+		importBuilder.append("import cg.base.io.proto.MessageIdProto.MessageId;").append("\r\n");
 		Map<String, String> imports = Maps.newHashMap();
 		imports.put(message.getProtoName(), message.getProtoName());
 		
@@ -182,8 +185,8 @@ public class MessageMaker {
 		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
 		builder.append(elementBuilder.toString());
 		builder.append("\r\n");
-		builder.append("\t").append("public ").append(javaName).append("(int messageId, int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
-		builder.append("\t\t").append("super(messageId, status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("(int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
+		builder.append("\t\t").append("super(MessageId.").append(message.getMessageIdName()).append("_VALUE, status, sessionId, sender, datas);").append("\r\n");
 		builder.append("\t\t").append("if (datas != null) {").append("\r\n");
 		builder.append("\t\t\t").append(param).append(".mergeFrom(datas);").append("\r\n");
 		builder.append("\t\t").append("}").append("\r\n");
@@ -191,6 +194,7 @@ public class MessageMaker {
 		builder.append("\r\n");
 		builder.append("\t").append("public ").append(javaName).append("() {").append("\r\n");
 		builder.append("\t\t").append("super();").append("\r\n");
+		builder.append("\t\t").append("messageId = MessageId.").append(message.getMessageIdName()).append("_VALUE;").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append(methodsBuilder.toString()).append("\r\n");

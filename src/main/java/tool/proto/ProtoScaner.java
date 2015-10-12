@@ -55,14 +55,14 @@ public class ProtoScaner {
 				} else if (line.startsWith("message") || line.startsWith("enum")) {
 					String messageName = line.split(" ")[1].replace("{", "");
 					message = map.get(messageName);
-					if (message == null) {
+					if (message == null) { // VO
 						message = new ProtoMessage();
+						message.setMessageIdName(messageName);
 						map.put(messageName, message);
 					}
 					message.setProtoName(protoName);
 					message.setEnum(line.startsWith("enum"));
 					message.setReturn(isReturn);
-					message.setMessageIdName(messageName);
 					isReturn = false;
 					protos.put(protoName, messageName);
 				} else if (message != null && line.trim().length() > 0 && !line.trim().startsWith("//")) {
