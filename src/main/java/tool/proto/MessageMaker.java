@@ -22,6 +22,8 @@ public class MessageMaker {
 				if (message.isServerProcessor() || message.isClientProcessor()) {
 					if (message.getFields().size() > 0) {
 						outputMessage(message, dir, path, protoPath);
+					} else {
+						outputEmptyMessage(message, dir, path, protoPath);
 					}
 				} else {
 					outputVO(message, dir, path, protoPath);
@@ -85,6 +87,46 @@ public class MessageMaker {
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append(methodsBuilder.toString());
+		builder.append("}").append("\r\n");
+		
+		FileWriter writer = new FileWriter(java);
+		writer.append(builder.toString());
+		writer.flush();
+		writer.close();
+	}
+	
+	private void outputEmptyMessage(ProtoMessage message, String dir, String path, String protoPath) throws Exception {
+		String name = JavaFilesMaker.makeJavaClassName(message.getName());
+		String javaName = name;
+		File java = new File(JavaFilesMaker.checkString(dir) ? dir : "../../../CrossGateBase/src");
+		java = new File(java, path);
+		java.mkdirs();
+		java = JavaFilesMaker.createFile(java, javaName + ".java");
+		
+		StringBuilder builder = new StringBuilder("package ");
+		builder.append(path.replaceAll("/", ".")).append(";").append("\r\n");
+		builder.append("\r\n");
+		
+		StringBuilder importBuilder = new StringBuilder();
+		importBuilder.append("import net.dipatch.ISender;").append("\r\n");
+		importBuilder.append("import net.io.protocal.proto.ProtoMessage;").append("\r\n");
+		
+		builder.append(importBuilder.toString());
+		builder.append("\r\n");
+		builder.append("/**").append("\r\n");
+		builder.append(" * This is a auto make java file, so do not modify me.").append("\r\n");
+		builder.append(" * @author fuhuiyuan").append("\r\n");
+		builder.append(" */").append("\r\n");
+		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
+		builder.append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("(int messageId, int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
+		builder.append("\t\t").append("super(messageId, status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t").append("}").append("\r\n");
+		builder.append("\r\n");
+		builder.append("\t").append("public ").append(javaName).append("() {").append("\r\n");
+		builder.append("\t\t").append("super();").append("\r\n");
+		builder.append("\t").append("}").append("\r\n");
+		builder.append("\r\n");
 		builder.append("}").append("\r\n");
 		
 		FileWriter writer = new FileWriter(java);
