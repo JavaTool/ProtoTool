@@ -187,6 +187,7 @@ public class MessageMaker {
 		builder.append("\r\n");
 		builder.append("\t").append("public ").append(javaName).append("(int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
 		builder.append("\t\t").append("super(MessageId.").append(message.getMessageIdName()).append("_VALUE, status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t\t").append("builder = ").append(message.getName()).append(".newBuilder();").append("\r\n");
 		builder.append("\t\t").append("if (datas != null) {").append("\r\n");
 		builder.append("\t\t\t").append(param).append(".mergeFrom(datas);").append("\r\n");
 		builder.append("\t\t").append("}").append("\r\n");
@@ -194,6 +195,7 @@ public class MessageMaker {
 		builder.append("\r\n");
 		builder.append("\t").append("public ").append(javaName).append("() {").append("\r\n");
 		builder.append("\t\t").append("super();").append("\r\n");
+		builder.append("\t\t").append("builder = ").append(message.getName()).append(".newBuilder();").append("\r\n");
 		builder.append("\t\t").append("messageId = MessageId.").append(message.getMessageIdName()).append("_VALUE;").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
