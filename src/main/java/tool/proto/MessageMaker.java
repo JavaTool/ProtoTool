@@ -223,19 +223,22 @@ public class MessageMaker {
 		if (field.type.equals("required") || field.type.equals("optional")) {
 			String checkName = checkClass(voClassName);
 			methodBuilder.append("\t").append("public ").append(checkName).append(" ").append(getter).append("() {").append("\r\n");
-			methodBuilder.append("\t\t").append(checkName).append(" ret = ");
+//			methodBuilder.append("\t\t").append(checkName).append(" ret = ");
 			if (isJavaStruct) {
-				methodBuilder.append(param).append(".").append(getter).append("();").append("\r\n");
+//				methodBuilder.append(param).append(".").append(getter).append("();").append("\r\n");
+				methodBuilder.append("\t\t").append("return ").append(param).append(".").append(getter).append("();").append("\r\n");
 			} else {
 				if (field.type.equals("optional")) {
-					methodBuilder.append("null;").append("\r\n");
-					methodBuilder.append("\t\t").append(className).append(" vo = this.").append(param).append(".").append(getter).append("();").append("\r\n");
-					methodBuilder.append("\t\t").append("ret = vo == null ? null : new ").append(voClassName).append("(vo);").append("\r\n");
+//					methodBuilder.append("null;").append("\r\n");
+//					methodBuilder.append("\t\t").append(className).append(" vo = this.").append(param).append(".").append(getter).append("();").append("\r\n");
+//					methodBuilder.append("\t\t").append("ret = vo == null ? null : new ").append(voClassName).append("(vo);").append("\r\n");
+					methodBuilder.append("\t\t").append("return vo.has").append(JavaFilesMaker.firstUpper(field.name)).append("() ? new ").append(voClassName).append("(").append("vo.").append(getter).append("()) : null;").append("\r\n");
 				} else {
-					methodBuilder.append("new ").append(voClassName).append("(").append(param).append(".").append(getter).append("());").append("\r\n");
+//					methodBuilder.append("new ").append(voClassName).append("(").append(param).append(".").append(getter).append("());").append("\r\n");
+					methodBuilder.append("\t\t").append("return new ").append(voClassName).append("(").append(param).append(".").append(getter).append("());").append("\r\n");
 				}
 			}
-			methodBuilder.append("\t\t").append("return ret;").append("\r\n");
+//			methodBuilder.append("\t\t").append("return ret;").append("\r\n");
 		} else if (field.type.equals("repeated")) {
 			JavaFilesMaker.addImport(imports, importBuilder, List.class);
 			if (isJavaStruct) {
