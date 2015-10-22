@@ -272,6 +272,10 @@ public class MessageMaker {
 		String voClassName = JavaFilesMaker.makeJavaClassName(className);
 		boolean isJavaStruct = JavaFilesMaker.isJavaStruct(className);
 		if (field.type.equals("required") || field.type.equals("optional")) {
+			if (field.type.equals("optional")) {
+				paramBulider.append("\t\t").append("if (").append(field.name).append(" != null) {").append("\r\n");
+				paramBulider.append("\t");
+			}
 			methodBuilder.append(voClassName).append(" ");
 			paramBulider.append("\t\t").append("builder.set").append(JavaFilesMaker.firstUpper(field.name)).append("(").append(field.name);
 			if (isJavaStruct) {
@@ -280,6 +284,9 @@ public class MessageMaker {
 				paramBulider.append(".get").append(className).append("());");
 			}
 			paramBulider.append("\r\n");
+			if (field.type.equals("optional")) {
+				paramBulider.append("\t\t").append("}").append("\r\n");
+			}
 		} else if (field.type.equals("repeated")) {
 			methodBuilder.append("Iterable<").append(voClassName).append("> ");
 			if (isJavaStruct) {
