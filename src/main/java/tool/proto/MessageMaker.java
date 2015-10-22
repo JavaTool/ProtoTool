@@ -229,7 +229,7 @@ public class MessageMaker {
 			} else {
 				if (field.type.equals("optional")) {
 					methodBuilder.append("null;").append("\r\n");
-					methodBuilder.append("\t\t").append(className).append(" vo = builder.").append(getter).append("();").append("\r\n");
+					methodBuilder.append("\t\t").append(className).append(" vo = this.").append(param).append(".").append(getter).append("();").append("\r\n");
 					methodBuilder.append("\t\t").append("ret = vo == null ? null : new ").append(voClassName).append("(vo);").append("\r\n");
 				} else {
 					methodBuilder.append("new ").append(voClassName).append("(").append(param).append(".").append(getter).append("());").append("\r\n");
