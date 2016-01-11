@@ -108,8 +108,8 @@ public class MessageMaker {
 		builder.append("\r\n");
 		
 		StringBuilder importBuilder = new StringBuilder();
-		importBuilder.append("import net.dipatch.ISender;").append("\r\n");
-		importBuilder.append("import net.io.protocal.proto.ProtoMessage;").append("\r\n");
+		importBuilder.append("import net.io.ISender;").append("\r\n");
+		importBuilder.append("import net.message.ByteArrayMessage;").append("\r\n");
 		importBuilder.append("import cg.base.io.proto.MessageIdProto.MessageId;").append("\r\n");
 		
 		builder.append(importBuilder.toString());
@@ -118,7 +118,7 @@ public class MessageMaker {
 		builder.append(" * This is a auto make java file, so do not modify me.").append("\r\n");
 		builder.append(" * @author fuhuiyuan").append("\r\n");
 		builder.append(" */").append("\r\n");
-		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
+		builder.append("public class ").append(javaName).append(" extends ByteArrayMessage {").append("\r\n");
 		builder.append("\r\n");
 		builder.append("\t").append("public ").append(javaName).append("(int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
 		builder.append("\t\t").append("super(MessageId.").append(message.getMessageIdName()).append("_VALUE, status, sessionId, sender, datas);").append("\r\n");
@@ -154,8 +154,8 @@ public class MessageMaker {
 		elementBuilder.append("\t").append("private ").append(paramDefine).append(";").append("\r\n");
 		
 		StringBuilder importBuilder = new StringBuilder(), methodsBuilder = new StringBuilder();
-		importBuilder.append("import net.dipatch.ISender;").append("\r\n");
-		importBuilder.append("import net.io.protocal.proto.ProtoMessage;").append("\r\n");
+		importBuilder.append("import net.io.ISender;").append("\r\n");
+		importBuilder.append("import net.message.ByteArrayMessage;").append("\r\n");
 		importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;").append("\r\n");
 		importBuilder.append("import cg.base.io.proto.MessageIdProto.MessageId;").append("\r\n");
 		Map<String, String> imports = Maps.newHashMap();
@@ -182,7 +182,7 @@ public class MessageMaker {
 		builder.append(" * This is a auto make java file, so do not modify me.").append("\r\n");
 		builder.append(" * @author fuhuiyuan").append("\r\n");
 		builder.append(" */").append("\r\n");
-		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
+		builder.append("public class ").append(javaName).append(" extends ByteArrayMessage {").append("\r\n");
 		builder.append(elementBuilder.toString());
 		builder.append("\r\n");
 		builder.append("\t").append("public ").append(javaName).append("(int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
