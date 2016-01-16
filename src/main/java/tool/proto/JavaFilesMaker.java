@@ -20,9 +20,7 @@ public class JavaFilesMaker {
 		try {
 			protoScaner.scan(dir);
 			Map<String, ProtoMessage> messages = protoScaner.getMessages();
-//			new RequestMaker(messages).output(args[0], PATH + "proto");
-			new RequestMaker(messages).output(args[0], PATH + "request", PATH + "proto");
-			new ResponseMaker(messages).output(args[0], PATH + "response", PATH + "proto");
+			new JavaMessageMaker(messages).output(args[0], PATH + "message", PATH + "proto");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -97,6 +95,23 @@ public class JavaFilesMaker {
 			imports.put(clz.getSimpleName(), clz.getSimpleName());
 			importBuilder.append("import ").append(clz.getName()).append(";").append("\r\n");
 		}
+	}
+	
+	public static String makeJavaClassName(String name) {
+		if (isJavaStruct(name)) {
+			return name;
+		} else {
+			String[] names = name.split("_");
+			StringBuilder nameBuilder = new StringBuilder();
+			for (String nam : names) {
+				nameBuilder.append(JavaFilesMaker.firstUpper(nam.toLowerCase()));
+			}
+			return nameBuilder.toString();
+		}
+	}
+	
+	public static boolean isJavaStruct(String name) {
+		return name.equals("Integer") || name.equals("Long") || name.equals("String") || name.equals("Boolean");
 	}
 
 }
