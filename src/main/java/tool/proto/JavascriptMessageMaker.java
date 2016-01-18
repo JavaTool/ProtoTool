@@ -19,9 +19,9 @@ public class JavascriptMessageMaker {
 			for (ProtoMessage message : messages.values()) {
 				if (message.isServerProcessor() || message.isClientProcessor()) {
 					if (message.getFields().size() > 0) {
-//						outputMessage(message, messagdPath, protoPath);
+						outputMessage(message, messagdPath, protoPath);
 					} else {
-//						outputEmptyMessage(message, messagdPath, protoPath);
+						outputEmptyMessage(message, messagdPath, protoPath);
 					}
 				} else {
 					outputVO(message, messagdPath, protoPath);
@@ -46,14 +46,9 @@ public class JavascriptMessageMaker {
 		String paramDefine1 = param1 + " : " + message.getName();
 		elementBuilder.append("\t").append("private var ").append(paramDefine1).append(";").append("\r\n");
 		elementBuilder.append("\r\n");
-//		String param2 = "builder";
-//		String paramDefine2 = param2 + " : " + message.getName();
-//		elementBuilder.append("\t").append("private var ").append(paramDefine2).append(";").append("\r\n");
 		
 		StringBuilder importBuilder = new StringBuilder(), methodsBuilder = new StringBuilder();
-//		importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;").append("\r\n");
 		Map<String, String> imports = Maps.newHashMap();
-//		imports.put(message.getProtoName(), message.getProtoName());
 		
 		for (ProtoMessageField field : message.getFields().values()) {
 			buildSet(methodsBuilder, importBuilder, field, imports, param1, importPre);
@@ -98,14 +93,11 @@ public class JavascriptMessageMaker {
 		java.mkdirs();
 		java = JavaFilesMaker.createFile(java, javaName + ".js");
 		
-		StringBuilder builder = new StringBuilder("package ");
-		builder.append(messagdPath.replaceAll("/", ".")).append(";").append("\r\n");
+		StringBuilder builder = new StringBuilder("#pragma strict");
 		builder.append("\r\n");
 		
 		StringBuilder importBuilder = new StringBuilder();
-		importBuilder.append("import net.dipatch.ISender;").append("\r\n");
-		importBuilder.append("import net.io.protocal.proto.ProtoMessage;").append("\r\n");
-		importBuilder.append("import cg.base.io.proto.MessageIdProto.MessageId;").append("\r\n");
+		importBuilder.append("import net.io;").append("\r\n");
 		
 		builder.append(importBuilder.toString());
 		builder.append("\r\n");
@@ -113,15 +105,15 @@ public class JavascriptMessageMaker {
 		builder.append(" * This is a auto make java file, so do not modify me.").append("\r\n");
 		builder.append(" * @author fuhuiyuan").append("\r\n");
 		builder.append(" */").append("\r\n");
-		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
+		builder.append("public class ").append(javaName).append(" extends ByteArrayMessage {").append("\r\n");
 		builder.append("\r\n");
-		builder.append("\t").append("public ").append(javaName).append("(int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
-		builder.append("\t\t").append("super(MessageId.").append(message.getMessageIdName()).append("_VALUE, status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t").append("function ").append(javaName).append("(status : int, sessionId : String, sender : ISender, datas : byte[]) {").append("\r\n");
+		builder.append("\t\t").append("ByteArrayMessage(Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append("), status, sessionId, sender, datas);").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
-		builder.append("\t").append("public ").append(javaName).append("() {").append("\r\n");
-		builder.append("\t\t").append("super();").append("\r\n");
-		builder.append("\t\t").append("messageId = MessageId.").append(message.getMessageIdName()).append("_VALUE;").append("\r\n");
+		builder.append("\t").append("function ").append(javaName).append("() {").append("\r\n");
+		builder.append("\t\t").append("ByteArrayMessage();").append("\r\n");
+		builder.append("\t\t").append("messageId = Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append(");").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append("}").append("\r\n");
@@ -147,26 +139,22 @@ public class JavascriptMessageMaker {
 		elementBuilder.append("\t").append("private var ").append(paramDefine).append(";").append("\r\n");
 		
 		StringBuilder importBuilder = new StringBuilder(), methodsBuilder = new StringBuilder();
-		importBuilder.append("import net.io.ISender;").append("\r\n");
-		importBuilder.append("import net.message.ProtoMessage;").append("\r\n");
-		importBuilder.append(importPre).append(message.getProtoName()).append("Protos.*;").append("\r\n");
-		importBuilder.append("import cg.base.io.proto.MessageIdProto.MessageId;").append("\r\n");
+		importBuilder.append("import net.io;").append("\r\n");
+		importBuilder.append("import cg.ba.io.proto;").append("\r\n");
 		Map<String, String> imports = Maps.newHashMap();
-		imports.put(message.getProtoName(), message.getProtoName());
 		
 		for (ProtoMessageField field : message.getFields().values()) {
 			buildSet(methodsBuilder, importBuilder, field, imports, param, importPre);
 			buildGet(methodsBuilder, importBuilder, field, imports, param);
 		}
 		
-		methodsBuilder.append("\t").append("public ").append(message.getName()).append(" get").append(name).append("() {").append("\r\n");
-		methodsBuilder.append("\t\t").append("return ").append(param).append(".build();").append("\r\n");
+		methodsBuilder.append("\t").append("function ").append(" get").append(name).append("() : ").append(message.getName()).append(" {").append("\r\n");
+		methodsBuilder.append("\t\t").append("return ").append(param).append(";").append("\r\n");
 		methodsBuilder.append("\t").append("}").append("\r\n");
 		methodsBuilder.append("\r\n");
 
-		methodsBuilder.append("\t").append("@Override").append("\r\n");
-		methodsBuilder.append("\t").append("public byte[] getByteArray() {").append("\r\n");
-		methodsBuilder.append("\t\t").append("return ").append(param).append(".build().toByteArray();").append("\r\n");
+		methodsBuilder.append("\t").append("function getByteArray() : byte[] {").append("\r\n");
+		methodsBuilder.append("\t\t").append("return IOUtils.serializeProto(").append(param).append(");").append("\r\n");
 		methodsBuilder.append("\t").append("}").append("\r\n");
 		
 		builder.append(importBuilder.toString());
@@ -175,21 +163,21 @@ public class JavascriptMessageMaker {
 		builder.append(" * This is a auto make java file, so do not modify me.").append("\r\n");
 		builder.append(" * @author fuhuiyuan").append("\r\n");
 		builder.append(" */").append("\r\n");
-		builder.append("public class ").append(javaName).append(" extends ProtoMessage {").append("\r\n");
+		builder.append("class ").append(javaName).append(" extends ByteArrayMessage {").append("\r\n");
 		builder.append(elementBuilder.toString());
 		builder.append("\r\n");
-		builder.append("\t").append("function ").append(javaName).append("(int status, String sessionId, ISender sender, byte[] datas) throws Exception {").append("\r\n");
-		builder.append("\t\t").append("super(MessageId.").append(message.getMessageIdName()).append("_VALUE, status, sessionId, sender, datas);").append("\r\n");
-		builder.append("\t\t").append("builder = ").append(message.getName()).append(".newBuilder();").append("\r\n");
+		builder.append("\t").append("function ").append(javaName).append("(status : int, sessionId : String, sender : ISender, datas : byte[]) {").append("\r\n");
+		builder.append("\t\t").append("ByteArrayMessage(Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append("), status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t\t").append("builder = new ").append(message.getName()).append("();").append("\r\n");
 		builder.append("\t\t").append("if (datas != null) {").append("\r\n");
-		builder.append("\t\t\t").append(param).append(".mergeFrom(datas);").append("\r\n");
+		builder.append("\t\t\t").append(param).append(" = IOUtils.deserializeProto(datas, ").append(message.getName()).append(");").append("\r\n");
 		builder.append("\t\t").append("}").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append("\t").append("function ").append(javaName).append("() {").append("\r\n");
-		builder.append("\t\t").append("super();").append("\r\n");
-		builder.append("\t\t").append("builder = ").append(message.getName()).append(".newBuilder();").append("\r\n");
-		builder.append("\t\t").append("messageId = MessageId.").append(message.getMessageIdName()).append("_VALUE;").append("\r\n");
+		builder.append("\t\t").append("ByteArrayMessage();").append("\r\n");
+		builder.append("\t\t").append("builder = new ").append(message.getName()).append("();").append("\r\n");
+		builder.append("\t\t").append("messageId = Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append(");").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append(methodsBuilder.toString()).append("\r\n");
