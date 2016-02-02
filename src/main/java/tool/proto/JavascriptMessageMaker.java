@@ -222,7 +222,7 @@ public class JavascriptMessageMaker {
 			} else {
 				methodBuilder.append("\t").append("function ").append(getter).append("List() : IList.<").append(voClassName).append("> {").append("\r\n");
 				methodBuilder.append("\t\t").append("var list : ").append("IList.<").append(className).append("> = ").append(param).append(".").append(field.name).append(";").append("\r\n");
-				methodBuilder.append("\t\t").append("var ret : ").append("IList.<").append(voClassName).append("> = new ArrayList(list.Count);").append("\r\n");
+				methodBuilder.append("\t\t").append("var ret : ").append("IList.<").append(voClassName).append("> = new List(list.Count);").append("\r\n");
 				methodBuilder.append("\t\t").append("for (var vo : ").append(className).append(" in list) {").append("\r\n");
 				methodBuilder.append("\t\t\t").append("ret.Add(new ").append(voClassName).append("(vo));").append("\r\n");
 				methodBuilder.append("\t\t").append("}").append("\r\n");
