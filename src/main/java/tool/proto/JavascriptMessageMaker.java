@@ -108,11 +108,11 @@ public class JavascriptMessageMaker {
 		builder.append("public class ").append(javaName).append(" extends ByteArrayMessage {").append("\r\n");
 		builder.append("\r\n");
 		builder.append("\t").append("function ").append(javaName).append("(status : int, sessionId : String, sender : ISender, datas : byte[]) {").append("\r\n");
-		builder.append("\t\t").append("ByteArrayMessage(Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append("), status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t\t").append("super(Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append("), status, sessionId, sender, datas);").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append("\t").append("function ").append(javaName).append("() {").append("\r\n");
-		builder.append("\t\t").append("ByteArrayMessage();").append("\r\n");
+		builder.append("\t\t").append("super();").append("\r\n");
 		builder.append("\t\t").append("messageId = Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append(");").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
@@ -167,7 +167,7 @@ public class JavascriptMessageMaker {
 		builder.append(elementBuilder.toString());
 		builder.append("\r\n");
 		builder.append("\t").append("function ").append(javaName).append("(status : int, sessionId : String, sender : ISender, datas : byte[]) {").append("\r\n");
-		builder.append("\t\t").append("ByteArrayMessage(Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append("), status, sessionId, sender, datas);").append("\r\n");
+		builder.append("\t\t").append("super(Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append("), status, sessionId, sender, datas);").append("\r\n");
 		builder.append("\t\t").append("builder = new ").append(message.getName()).append("();").append("\r\n");
 		builder.append("\t\t").append("if (datas != null) {").append("\r\n");
 		builder.append("\t\t\t").append(param).append(" = IOUtils.deserializeProto(datas, ").append(message.getName()).append(");").append("\r\n");
@@ -175,7 +175,7 @@ public class JavascriptMessageMaker {
 		builder.append("\t").append("}").append("\r\n");
 		builder.append("\r\n");
 		builder.append("\t").append("function ").append(javaName).append("() {").append("\r\n");
-		builder.append("\t\t").append("ByteArrayMessage();").append("\r\n");
+		builder.append("\t\t").append("super();").append("\r\n");
 		builder.append("\t\t").append("builder = new ").append(message.getName()).append("();").append("\r\n");
 		builder.append("\t\t").append("messageId = Convert.ToInt32(MessageId.").append(message.getMessageIdName()).append(");").append("\r\n");
 		builder.append("\t").append("}").append("\r\n");
