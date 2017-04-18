@@ -113,5 +113,21 @@ public class JavaFilesMaker {
 	public static boolean isJavaStruct(String name) {
 		return name.equals("Integer") || name.equals("Long") || name.equals("String") || name.equals("Boolean");
 	}
+	
+	public static String makeJavascriptClassName(String name) {
+		return name;
+	}
+	
+	public static String getJavascriptClassName(String name) {
+		return name;
+	}
+	
+	public static boolean isJavascriptStruct(String name) {
+		return true;
+	}
+	
+	public static void addImport(Map<String, String> imports, StringBuilder importBuilder, String key, String value) {
+		
+	}
 
 }
